@@ -2,9 +2,11 @@ package images.data;
 
 import images.BaseTestForImages;
 import imgur.Params;
+import imgur.images.ImagesResponse;
 import org.junit.jupiter.api.*;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @DisplayName("Проверка загрузки данных изображения")
@@ -17,82 +19,62 @@ public class CheckingImageDataLoadingTests extends BaseTestForImages {
     @Test
     @Order(1)
     void withoutData() {
-        given()
-                .when()
-                .auth()
-                .oauth2(Params.TOKEN)
-                .formParam("image", urlImageJpeg)
-                .expect()
-                .statusCode(200)
-                .body("success", is(true))
-                .body("data.title", is(nullValue()))
-                .body("data.description", is(nullValue()))
-                .body("data.name", is(""))
-                .when()
-                .post(Params.BASE_URL + Params.IMAGE)
-                .prettyPrint();
+        ImagesResponse imagesWithoutData =
+                given()
+                        .formParam("image", urlImageJpeg)
+                        .when()
+                        .post(Params.BASE_URL + Params.IMAGE)
+                        .as(ImagesResponse.class);
+        assertThat(imagesWithoutData.getData().getTitle(), is(nullValue()));
+        assertThat(imagesWithoutData.getData().getDescription(), is(nullValue()));
+        assertThat(imagesWithoutData.getData().getName(), is(""));
     }
 
     @DisplayName("С названием")
     @Test
     @Order(2)
     void withTitle() {
-        given()
-                .when()
-                .auth()
-                .oauth2(Params.TOKEN)
-                .formParam("image", urlImageJpeg)
-                .formParam("title", Params.IMAGE_TITLE)
-                .expect()
-                .statusCode(200)
-                .body("success", is(true))
-                .body("data.title", is(Params.IMAGE_TITLE))
-                .body("data.description", is(nullValue()))
-                .body("data.name", is(""))
-                .when()
-                .post(Params.BASE_URL + Params.IMAGE)
-                .prettyPrint();
+        ImagesResponse imagesWithTitle =
+                given()
+                        .formParam("image", urlImageJpeg)
+                        .formParam("title", Params.IMAGE_TITLE)
+                        .when()
+                        .post(Params.BASE_URL + Params.IMAGE)
+                        .as(ImagesResponse.class);
+        assertThat(imagesWithTitle.getData().getTitle(), is(Params.IMAGE_TITLE));
+        assertThat(imagesWithTitle.getData().getDescription(), is(nullValue()));
+        assertThat(imagesWithTitle.getData().getName(), is(""));
     }
 
     @DisplayName("С описанием")
     @Test
     @Order(3)
     void withDescription() {
-        given()
-                .when()
-                .auth()
-                .oauth2(Params.TOKEN)
-                .formParam("image", urlImageJpeg)
-                .formParam("description", Params.IMAGE_DESCRIPTION)
-                .expect()
-                .statusCode(200)
-                .body("success", is(true))
-                .body("data.title", is(nullValue()))
-                .body("data.description", is(Params.IMAGE_DESCRIPTION))
-                .body("data.name", is(""))
-                .when()
-                .post(Params.BASE_URL + Params.IMAGE)
-                .prettyPrint();
+        ImagesResponse imagesWithDescription =
+                given()
+                        .formParam("image", urlImageJpeg)
+                        .formParam("description", Params.IMAGE_DESCRIPTION)
+                        .when()
+                        .post(Params.BASE_URL + Params.IMAGE)
+                        .as(ImagesResponse.class);
+        assertThat(imagesWithDescription.getData().getTitle(), is(nullValue()));
+        assertThat(imagesWithDescription.getData().getDescription(), is(Params.IMAGE_DESCRIPTION));
+        assertThat(imagesWithDescription.getData().getName(), is(""));
     }
 
     @DisplayName("С именем")
     @Test
     @Order(4)
     void withName() {
-        given()
-                .when()
-                .auth()
-                .oauth2(Params.TOKEN)
-                .formParam("image", urlImageJpeg)
-                .formParam("name", Params.IMAGE_NAME)
-                .expect()
-                .statusCode(200)
-                .body("success", is(true))
-                .body("data.title", is(nullValue()))
-                .body("data.description", is(nullValue()))
-                .body("data.name", is(Params.IMAGE_NAME))
-                .when()
-                .post(Params.BASE_URL + Params.IMAGE)
-                .prettyPrint();
+        ImagesResponse imagesWithName =
+                given()
+                        .formParam("image", urlImageJpeg)
+                        .formParam("name", Params.IMAGE_NAME)
+                        .when()
+                        .post(Params.BASE_URL + Params.IMAGE)
+                        .as(ImagesResponse.class);
+        assertThat(imagesWithName.getData().getTitle(), is(nullValue()));
+        assertThat(imagesWithName.getData().getDescription(), is(nullValue()));
+        assertThat(imagesWithName.getData().getName(), is(Params.IMAGE_NAME));
     }
 }
